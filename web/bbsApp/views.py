@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import *
+from django.http import JsonResponse
 # Create your views here.
 # select * from table ;
 # ORM -> modelName.objects.all() : 전체를 가져옴
@@ -122,3 +123,50 @@ def bbs_read(request, id) :
                'id': request.session['user_id']
                }
     return render(request, 'read.html',context)
+
+def bbs_remove(request) :
+    id = request.POST['id']
+    print('request bbs_remove param id - ', id)
+    Bbs.objects.get(id=id).delete()
+    return redirect('bbs_list')
+
+def bbs_modifyForm(request) :
+    id = request.POST['id']
+    print('request bbs_modifyForm param id - ', id)
+    board = Bbs.objects.get(id=id)
+    context = {'board': board,
+               'name': request.session['user_name'],
+               'id': request.session['user_id']
+               }
+    return render(request,'modify.html',context)
+
+def bbs_modify(request) :
+    id = request.POST['id']
+    title = request.POST['title']
+    content = request.POST['content']
+    writer = request.POST['writer']
+    print('request modify - ', id, title, content, writer)
+    board = Bbs.objects.get(id=id)
+    board.title = title
+    board.content = content
+    board.save()
+    return redirect('bbs_list')
+
+def bbs_search(request) :
+    type = request.POST['type']
+    keyword = request.POST['keyword']
+    print('request bbs_search - ', type, keyword)
+    if type == 'title' :
+        boards = Bbs.objects.filter(title__icontains = keyword)
+    if type == 'writer' :
+        boards = Bbs.objects.filter(writer__startswith=keyword)
+    list = []
+    for board in boards :
+        list.append({
+            'id' : board.id,
+            'title' : board.title,
+            'writer' : board.writer,
+            'regdate' : board.regdate,
+            'viewcnt' : board.viewCnt
+        })
+    return JsonResponse(list, safe=False)

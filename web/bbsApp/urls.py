@@ -13,5 +13,9 @@ urlpatterns = [
     path('bbs_register/', views.bbs_register, name='bbs_register'),
     # get 방식
     path('bbs_read/<int:id>', views.bbs_read, name='bbs_read'),
+    path('bbs_remove/', views.bbs_remove, name='bbs_remove'),
+    path('bbs_modifyForm/', views.bbs_modifyForm, name='bbs_modifyForm'),
+    path('bbs_modify/', views.bbs_modify, name='bbs_modify'),
+    path('bbs_search/', views.bbs_search, name='bbs_search'),
 
 ]
